@@ -21,6 +21,8 @@ sub new {
 	return $self;
 }
 
+# accessors
+
 sub cgi_app_class {
 	my ($self, $cgi_app_class) = @_;
 	if (defined $cgi_app_class) {
@@ -46,6 +48,8 @@ sub entry_point {
 	$self->{entry_point} = $entry_point if defined $entry_point;
 	$self->{entry_point};	
 }
+
+# check request
 
 sub is_entry_point {
 	my ($self, $uri) = @_;
