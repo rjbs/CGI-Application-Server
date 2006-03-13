@@ -3,6 +3,7 @@ package HTTP::Server::Simple::CGI::Application;
 
 use strict;
 use warnings;
+use Carp;
 
 use Carp         'confess';
 use Scalar::Util 'blessed';
