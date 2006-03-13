@@ -5,8 +5,9 @@ use warnings;
 
 use lib 't/lib/';
 
-use Test::More tests => 25;
+use Test::More tests => 27;
 
+use Test::Exception;
 use Test::HTTP::Server::Simple;
 use Test::WWW::Mechanize;
 
@@ -27,9 +28,17 @@ my $server = TestServer->new();
 isa_ok($server, 'HTTP::Server::Simple::CGI::Application');
 isa_ok($server, 'HTTP::Server::Simple');
 
+dies_ok {
+	$server->run();
+} '... cannot load a server without the cgi-app-class';
+
 is($server->cgi_app_class, undef, '... no cgi-app-class yet');
 $server->cgi_app_class('MyCGIApp');
 is($server->cgi_app_class, 'MyCGIApp', '... we have a cgi-app-class now');
+
+dies_ok {
+	$server->run();
+} '... cannot load a server without the entry_point';
 
 is($server->entry_point, undef, '... no entry-point yet');
 $server->entry_point('/index.cgi');

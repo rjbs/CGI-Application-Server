@@ -12,6 +12,8 @@ our $VERSION = '0.01';
 
 use base qw(HTTP::Server::Simple::CGI HTTP::Server::Simple::Static);
 
+# HTTP::Server::Simple methods
+
 sub new {
 	my $class = shift;
 	my $self  = $class->SUPER::new(@_); 
@@ -19,6 +21,15 @@ sub new {
 	$self->{entry_point}   = undef;	
 	$self->{server_root}   = '.';
 	return $self;
+}
+
+sub run {
+	my $self = shift;
+	(defined $self->{entry_point})
+		|| confess "No entry point has been defined yet, please do so and restart the server";	
+	(defined $self->{cgi_app_class})
+		|| confess "No CGI::Application class has been defined yet, please do so and restart the server";	
+	$self->SUPER::run(@_);	
 }
 
 # accessors
@@ -53,10 +64,7 @@ sub entry_point {
 
 sub is_entry_point {
 	my ($self, $uri) = @_;
-	my $entry_point = $self->entry_point;
-	#warn "URI: $uri";
-	#warn "entry_point: $entry_point";	
-	return index($uri, $entry_point) == 0;
+	return index($uri, $self->entry_point) == 0;
 }
 
 sub handle_request {
@@ -98,29 +106,58 @@ HTTP::Server::Simple::CGI::Application - A HTTP::Server::Simple subclass for dev
 
 =head1 DESCRIPTION
 
+This is a simple L<HTTP::Server::Simple> subclass for use during 
+development with L<CGI::Appliaction>. 
+
 =head1 METHODS
 
 =head2 HTTP::Server::Simple methods
+
+These are overridden L<HTTP::Server::Simple> methods.
 
 =over 4
 
 =item B<new ($port)>
 
-=item B<handle_request ($cgi)>
+This acts just like C<new> for L<HTTP::Server::Simple>, except it 
+will initialize instance slots that we use.
 
-=item B<is_entry_point ($uri)>
+=item B<handle_request>
+
+This will check the request uri and dispatch appropriately.
+
+=item B<run>
+
+This just makes sure that all the nessecary values have been set 
+before it starts the server.
 
 =back
 
-=head2 Accessors
+=head2 Accessors & Utils
 
 =over 4
 
 =item B<cgi_app_class (?$cgi_app_class)>
 
+This is the package name of your L<CGI::Application> class, the 
+C<handle_request> method will use this to handle requests which 
+match the C<entry_point>. 
+
 =item B<entry_point (?$entry_point)>
 
+This is the entry point of your L<CGI::Application>, typically 
+this will be either a C<.cgi> file or a url-path of some kind. 
+The C<handle_request> method will check the requested uri, and 
+try to match the entry point to the begining of the url.
+
+=item B<is_entry_point ($uri)>
+
+This performs the entry point to C<$uri> match test.
+
 =item B<server_root (?$server_root)>
+
+This is the server's document root where all static files will 
+be served from.
 
 =back
 
@@ -132,8 +169,8 @@ to cpan-RT.
 
 =head1 CODE COVERAGE
 
-I use L<Devel::Cover> to test the code coverage of my tests, below is the 
-L<Devel::Cover> report on this module's test suite.
+I use L<Devel::Cover> to test the code coverage of my tests, below 
+is the L<Devel::Cover> report on this module's test suite.
 
 =head1 ACKNOWLEDGEMENTS
 

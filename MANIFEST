@@ -1,0 +1,14 @@
+Build.PL
+ChangeLog
+MANIFEST
+MANIFEST.SKIP
+README
+lib/HTTP/Server/Simple/CGI/Application.pm
+t/000_load.t
+t/001_basic.t
+t/pod.t
+t/pod_coverage.t
+t/htdocs/index.html
+t/htdocs/test.css
+t/htdocs/test.js
+t/lib/MyCGIApp.pm
