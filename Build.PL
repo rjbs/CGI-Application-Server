@@ -10,7 +10,6 @@ my $build = Module::Build->new(
         'Carp'         => '0.01',
         'CGI::Application'             => '0',
         'HTTP::Server::Simple'         => '0',
-        'HTTP::Server::Simple::Static' => '0',        
         'HTTP::Server::Simple::Static' => '0',
     },
     optional => {
