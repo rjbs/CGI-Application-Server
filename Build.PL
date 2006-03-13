@@ -8,9 +8,9 @@ my $build = Module::Build->new(
     requires => {
         'Scalar::Util' => '1.18',
         'Carp'         => '0.01',
-        'IO::Capture::Stdout'  => '0',
-        'CGI::Application'     => '0',
-        'HTTP::Server::Simple' => '0',
+        'CGI::Application'             => '0',
+        'HTTP::Server::Simple'         => '0',
+        'HTTP::Server::Simple::Static' => '0',        
     },
     optional => {
     },
