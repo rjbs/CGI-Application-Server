@@ -8,15 +8,17 @@ my $build = Module::Build->new(
     requires => {
         'Scalar::Util' => '1.18',
         'Carp'         => '0.01',
-        'CGI::Application'             => '0',
-        'HTTP::Server::Simple'         => '0',
-        'HTTP::Server::Simple::Static' => '0',
+        'CGI::Application'             => '4.05',
+        'HTTP::Server::Simple'         => '0.18',
+        'HTTP::Server::Simple::Static' => '0.02',
     },
     optional => {
     },
     build_requires => {
-        'Test::More'      => '0.47',
-        'Test::Exception' => '0.21',
+        'Test::More'                 => '0.47',
+        'Test::Exception'            => '0.21',
+        'Test::HTTP::Server::Simple' => '0.02',
+        'Test::WWW::Mechanize'       => '1.08',
     },
     create_makefile_pl => 'traditional',
     recursive_test_files => 1,

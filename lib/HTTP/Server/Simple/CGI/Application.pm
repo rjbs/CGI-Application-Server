@@ -100,13 +100,15 @@ HTTP::Server::Simple::CGI::Application - A HTTP::Server::Simple subclass for dev
 
 =head1 METHODS
 
-=head2 Overridden HTTP::Server::Simple methods
+=head2 HTTP::Server::Simple methods
 
 =over 4
 
-=item B<new>
+=item B<new ($port)>
 
-=item B<handle_request>
+=item B<handle_request ($cgi)>
+
+=item B<is_entry_point ($uri)>
 
 =back
 

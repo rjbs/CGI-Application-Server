@@ -13,13 +13,13 @@ sub setup {
 }	
 
 sub hello_world {
-	return "<HTML><BODY><H1>Hello World!</H1><HR>" . 
+	return "<HTML><TITLE>Hello</TITLE><BODY><H1>Hello World!</H1><HR>" . 
 		   "<A HREF='index.cgi?rm=mode2'>Goodbye</A>" . 
 		   "</BODY></HTML>";
 }
 
 sub goodbye_world {
-	return "<HTML><BODY><H1>Goodbye World!</H1><HR>" . 
+	return "<HTML><TITLE>Goodbye</TITLE><BODY><H1>Goodbye World!</H1><HR>" . 
 	       "<A HREF='index.cgi?rm=mode1'>Hello</A>" . 
 	   	   "</BODY></HTML>";		
 }
