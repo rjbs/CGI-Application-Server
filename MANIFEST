@@ -3,7 +3,7 @@ ChangeLog
 MANIFEST
 MANIFEST.SKIP
 README
-lib/HTTP/Server/Simple/CGI/Application.pm
+lib/CGI/Application/Server.pm
 t/000_load.t
 t/001_basic.t
 t/pod.t
