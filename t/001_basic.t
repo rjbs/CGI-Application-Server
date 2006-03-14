@@ -12,7 +12,7 @@ use Test::HTTP::Server::Simple;
 use Test::WWW::Mechanize;
 
 BEGIN {
-    use_ok('HTTP::Server::Simple::CGI::Application');
+    use_ok('CGI::Application::Server');
     use_ok('MyCGIApp');
 }
 
@@ -20,12 +20,12 @@ BEGIN {
 	package TestServer;
 	use base qw/
 		Test::HTTP::Server::Simple
-		HTTP::Server::Simple::CGI::Application
+		CGI::Application::Server
 	/;
 }
 
 my $server = TestServer->new();
-isa_ok($server, 'HTTP::Server::Simple::CGI::Application');
+isa_ok($server, 'CGI::Application::Server');
 isa_ok($server, 'HTTP::Server::Simple');
 
 is_deeply($server->entry_points, {}, '... no entry-point yet');

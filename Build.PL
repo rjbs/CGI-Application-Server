@@ -3,7 +3,7 @@ use Module::Build;
 use strict;
 
 my $build = Module::Build->new(
-    module_name => 'HTTP::Server::Simple::CGI::Application',
+    module_name => 'CGI::Application::Server',
     license => 'perl',
     requires => {
         'Scalar::Util' => '1.18',

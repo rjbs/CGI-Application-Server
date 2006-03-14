@@ -1,5 +1,5 @@
 
-package HTTP::Server::Simple::CGI::Application;
+package CGI::Application::Server;
 
 use strict;
 use warnings;
@@ -77,13 +77,13 @@ __END__
 
 =head1 NAME
 
-HTTP::Server::Simple::CGI::Application - A HTTP::Server::Simple subclass for developing CGI::Application
+CGI::Application::Server - A HTTP::Server::Simple subclass for developing CGI::Application
 
 =head1 SYNOPSIS
 
-  use HTTP::Server::Simple::CGI::Application;
+  use CGI::Application::Server;
 
-  my $server = HTTP::Server::Simple::CGI::Application->new();
+  my $server = CGI::Application::Server->new();
   $server->server_root('./htdocs');
   $server->entry_points({
 	  '/index.cgi' => 'MyCGIApp',

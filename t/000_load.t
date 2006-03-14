@@ -6,5 +6,5 @@ use warnings;
 use Test::More tests => 1;
 
 BEGIN {
-    use_ok('HTTP::Server::Simple::CGI::Application');
+    use_ok('CGI::Application::Server');
 }
