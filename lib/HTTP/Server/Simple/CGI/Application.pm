@@ -6,7 +6,7 @@ use warnings;
 use Carp;
 
 use Carp         'confess';
-use Scalar::Util 'blessed';
+use Scalar::Util 'blessed', 'reftype';
 
 our $VERSION = '0.01';
 
@@ -17,32 +17,12 @@ use base qw(HTTP::Server::Simple::CGI HTTP::Server::Simple::Static);
 sub new {
 	my $class = shift;
 	my $self  = $class->SUPER::new(@_); 
-	$self->{cgi_app_class} = undef;
-	$self->{entry_point}   = undef;	
-	$self->{server_root}   = '.';
+	$self->{entry_points} = {};	
+	$self->{server_root}  = '.';
 	return $self;
 }
 
-sub run {
-	my $self = shift;
-	(defined $self->{entry_point})
-		|| confess "No entry point has been defined yet, please do so and restart the server";	
-	(defined $self->{cgi_app_class})
-		|| confess "No CGI::Application class has been defined yet, please do so and restart the server";	
-	$self->SUPER::run(@_);	
-}
-
 # accessors
-
-sub cgi_app_class {
-	my ($self, $cgi_app_class) = @_;
-	if (defined $cgi_app_class) {
-		($cgi_app_class->isa('CGI::Application'))
-			|| confess "You must provide a valid CGI::Application derived class, you gave me: ($cgi_app_class)";
-		$self->{cgi_app_class} = $cgi_app_class;
-	}
-	$self->{cgi_app_class};
-}
 
 sub server_root {
 	my ($self, $server_root) = @_;
@@ -54,37 +34,42 @@ sub server_root {
 	$self->{server_root};
 }
 
-sub entry_point {
-	my ($self, $entry_point) = @_;
-	$self->{entry_point} = $entry_point if defined $entry_point;
-	$self->{entry_point};	
+sub entry_points {
+	my ($self, $entry_points) = @_;
+	if (defined $entry_points) {
+		(reftype($entry_points) && reftype($entry_points) eq 'HASH')
+			|| confess "The entry points map must be a HASH reference, not $entry_points";
+		$self->{entry_points} = $entry_points;
+	}
+	$self->{entry_points};	
 }
 
 # check request
 
-sub is_entry_point {
+sub is_valid_entry_point {
 	my ($self, $uri) = @_;
-	return index($uri, $self->entry_point) == 0;
+	foreach my $entry_point (keys %{$self->{entry_points}}) {
+		return $self->{entry_points}->{$entry_point}
+			if index($uri, $entry_point) == 0;
+	}
+	return undef;
 }
 
 sub handle_request {
 	my ($self, $cgi) = @_;
-	unless ($self->is_entry_point($ENV{REQUEST_URI})) {
-    	$self->serve_static($cgi, $self->server_root);
-	} 
-	else {	
+	if (my $entry_point = $self->is_valid_entry_point($ENV{REQUEST_URI})) {
 		# NOTE:
 		# this does not handle Redirects correctly,.. 
 		# how should we handle those?
     	print "HTTP/1.0 200 OK\r\n";
-		$self->cgi_app_class->new->run;			
+		$entry_point->new->run;		
 	}
+	else {
+    	$self->serve_static($cgi, $self->server_root);
+	} 
 }
 
 1;
-
-__END__
-
 
 __END__
 
@@ -99,9 +84,11 @@ HTTP::Server::Simple::CGI::Application - A HTTP::Server::Simple subclass for dev
   use HTTP::Server::Simple::CGI::Application;
 
   my $server = HTTP::Server::Simple::CGI::Application->new();
-  $server->cgi_app_class('MyCGIApp');
-  $server->entry_point('/index.cgi');
-  $server->server_root('./t/htdocs');
+  $server->server_root('./htdocs');
+  $server->entry_points({
+	  '/index.cgi' => 'MyCGIApp',
+	  '/admin'     => 'MyCGIApp::Admin'
+  });
   $server->run();
 
 =head1 DESCRIPTION
@@ -126,31 +113,15 @@ will initialize instance slots that we use.
 
 This will check the request uri and dispatch appropriately.
 
-=item B<run>
-
-This just makes sure that all the nessecary values have been set 
-before it starts the server.
-
 =back
 
 =head2 Accessors & Utils
 
 =over 4
 
-=item B<cgi_app_class (?$cgi_app_class)>
+=item B<entry_points (?$entry_points)>
 
-This is the package name of your L<CGI::Application> class, the 
-C<handle_request> method will use this to handle requests which 
-match the C<entry_point>. 
-
-=item B<entry_point (?$entry_point)>
-
-This is the entry point of your L<CGI::Application>, typically 
-this will be either a C<.cgi> file or a url-path of some kind. 
-The C<handle_request> method will check the requested uri, and 
-try to match the entry point to the begining of the url.
-
-=item B<is_entry_point ($uri)>
+=item B<is_valid_entry_point ($uri)>
 
 This performs the entry point to C<$uri> match test.
 

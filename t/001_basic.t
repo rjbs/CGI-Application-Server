@@ -5,7 +5,7 @@ use warnings;
 
 use lib 't/lib/';
 
-use Test::More tests => 27;
+use Test::More tests => 23;
 
 use Test::Exception;
 use Test::HTTP::Server::Simple;
@@ -28,21 +28,11 @@ my $server = TestServer->new();
 isa_ok($server, 'HTTP::Server::Simple::CGI::Application');
 isa_ok($server, 'HTTP::Server::Simple');
 
-dies_ok {
-	$server->run();
-} '... cannot load a server without the cgi-app-class';
-
-is($server->cgi_app_class, undef, '... no cgi-app-class yet');
-$server->cgi_app_class('MyCGIApp');
-is($server->cgi_app_class, 'MyCGIApp', '... we have a cgi-app-class now');
-
-dies_ok {
-	$server->run();
-} '... cannot load a server without the entry_point';
-
-is($server->entry_point, undef, '... no entry-point yet');
-$server->entry_point('/index.cgi');
-is($server->entry_point, '/index.cgi', '... we have an entry point now');
+is_deeply($server->entry_points, {}, '... no entry-point yet');
+$server->entry_points({
+	'/index.cgi' => 'MyCGIApp'
+});
+is_deeply($server->entry_points, { '/index.cgi' => 'MyCGIApp' }, '... we have an entry point now');
 
 is($server->server_root, '.', '... got the default server root');
 $server->server_root('./t/htdocs');
