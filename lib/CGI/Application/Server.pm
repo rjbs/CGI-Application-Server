@@ -98,10 +98,6 @@ development with L<CGI::Appliaction>.
 
 =head1 METHODS
 
-=head2 HTTP::Server::Simple methods
-
-These are overridden L<HTTP::Server::Simple> methods.
-
 =over 4
 
 =item B<new ($port)>
@@ -111,19 +107,18 @@ will initialize instance slots that we use.
 
 =item B<handle_request>
 
-This will check the request uri and dispatch appropriately.
-
-=back
-
-=head2 Accessors & Utils
-
-=over 4
+This will check the request uri and dispatch appropriately, either 
+to an entry point, or serve a static file (html, jpeg, gif, etc).
 
 =item B<entry_points (?$entry_points)>
 
+This accepts a HASH reference in C<$entry_points>, which maps 
+server entry points (uri) to L<CGI::Application> class names. 
+See the L<SYNOPSIS> above for an example.
+
 =item B<is_valid_entry_point ($uri)>
 
-This performs the entry point to C<$uri> match test.
+This attempts to match the C<$uri> to an entry point.
 
 =item B<server_root (?$server_root)>
 
