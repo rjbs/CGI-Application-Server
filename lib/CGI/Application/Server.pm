@@ -12,6 +12,11 @@ our $VERSION = '0.01';
 
 use base qw(HTTP::Server::Simple::CGI HTTP::Server::Simple::Static);
 
+use HTTP::Response;
+use HTTP::Status;
+
+use IO::Capture::Stdout;
+
 # HTTP::Server::Simple methods
 
 sub new {
@@ -58,16 +63,69 @@ sub is_valid_entry_point {
 sub handle_request {
 	my ($self, $cgi) = @_;
 	if (my $entry_point = $self->is_valid_entry_point($ENV{REQUEST_URI})) {
-		# NOTE:
-		# this does not handle Redirects correctly,.. 
-		# how should we handle those?
-    	print "HTTP/1.0 200 OK\r\n";
+        my $capture = IO::Capture::Stdout->new;
+        $capture->start;
 		$entry_point->new->run;		
+        $capture->stop;
+        my $stdout = join "\x0d\x0a", $capture->read;
+        my $response = $self->_build_response( $stdout );
+        print $response->as_string;
 	}
 	else {
-    	$self->serve_static($cgi, $self->document_root);
+    	return $self->serve_static($cgi, $self->document_root);
 	} 
 }
+
+# Shamelessly stolen from HTTP::Request::AsCGI by chansen
+sub _build_response {
+    my ( $self, $stdout ) = @_;
+
+    $stdout =~ s{(.*\x0d?\x0a\x0d?\x0a)}{}xsm;
+    my $headers = $1;
+
+    unless ( defined $headers ) {
+        $headers = "HTTP/1.1 500 Internal Server Error\x0d\x0a";
+    }
+
+    unless ( $headers =~ /^HTTP/ ) {
+        $headers = "HTTP/1.1 200 OK\x0d\x0a" . $headers;
+    }
+
+    my $response = HTTP::Response->parse($headers);
+    $response->date( time() ) unless $response->date;
+
+    my $message = $response->message;
+    my $status  = $response->header('Status');
+
+    if ( $message && $message =~ /^(.+)\x0d$/ ) {
+        $response->message($1);
+    }
+
+    if ( $status && $status =~ /^(\d\d\d)\s?(.+)?$/ ) {
+
+        my $code    = $1;
+        my $message = $2 || HTTP::Status::status_message($code);
+
+        $response->code($code);
+        $response->message($message);
+    }
+    
+    my $length = length $stdout;
+
+    if ( $response->code == 500 && !$length ) {
+
+        $response->content( $response->error_as_HTML );
+        $response->content_type('text/html');
+
+        return $response;
+    }
+
+    $response->add_content($stdout);
+    $response->content_length($length);
+
+    return $response;
+}
+
 
 1;
 

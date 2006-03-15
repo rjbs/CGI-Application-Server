@@ -5,7 +5,7 @@ use warnings;
 
 use lib 't/lib/';
 
-use Test::More tests => 23;
+use Test::More tests => 31;
 
 use Test::Exception;
 use Test::HTTP::Server::Simple;
@@ -60,6 +60,12 @@ $mech->title_is('Hello', '... got the right page title for index.cgi (hello)');
 $mech->get_ok($url_root.'/index.cgi?rm=mode2', '... got the index.cgi page okay');
 $mech->title_is('Goodbye', '... got the right page title for index.cgi (goodbye)');
 
+$mech->get_ok($url_root.'/index.cgi?rm=mode4', '... got the index.cgi page okay');
+$mech->title_is('Redirect End', '... got the right page title for index.cgi (redirect end)');
+
+$mech->get_ok($url_root.'/index.cgi?rm=mode3', '... got the index.cgi page okay');
+$mech->title_is('Redirect End', '... got the right page title for index.cgi (redirect end)');
+
 # test with extra path info after the entry point
 
 $mech->get_ok($url_root.'/index.cgi/test', '... got the index.cgi page okay (even with extra path info)');
@@ -70,3 +76,9 @@ $mech->title_is('Hello', '... got the right page title for index.cgi (even with 
 
 $mech->get_ok($url_root.'/index.cgi/test?rm=mode2', '... got the index.cgi page okay (even with extra path info)');
 $mech->title_is('Goodbye', '... got the right page title for index.cgi (even with extra path info)');
+
+$mech->get_ok($url_root.'/index.cgi/test?rm=mode4', '... got the index.cgi page okay (even with extra path info)');
+$mech->title_is('Redirect End', '... got the right page title for index.cgi (even with extra path info)');
+
+$mech->get_ok($url_root.'/index.cgi/test?rm=mode3', '... got the index.cgi page okay (even with extra path info)');
+$mech->title_is('Redirect End', '... got the right page title for index.cgi (even with extra path info)');
