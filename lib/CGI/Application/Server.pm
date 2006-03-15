@@ -80,7 +80,7 @@ sub handle_request {
 sub _build_response {
     my ( $self, $stdout ) = @_;
 
-    $stdout =~ s{(.*\x0d?\x0a\x0d?\x0a)}{}xsm;
+    $stdout =~ s{(.*?\x0d?\x0a\x0d?\x0a)}{}xsm;
     my $headers = $1;
 
     unless ( defined $headers ) {
@@ -96,6 +96,8 @@ sub _build_response {
 
     my $message = $response->message;
     my $status  = $response->header('Status');
+
+    $response->header( Connection => 'close' );
 
     if ( $message && $message =~ /^(.+)\x0d$/ ) {
         $response->message($1);
