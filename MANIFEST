@@ -1,7 +1,6 @@
 Build.PL
 ChangeLog
 MANIFEST
-MANIFEST.SKIP
 README
 lib/CGI/Application/Server.pm
 t/000_load.t
