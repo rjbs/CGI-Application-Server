@@ -134,7 +134,7 @@ __END__
 
 =head1 NAME
 
-CGI::Application::Server - A HTTP::Server::Simple subclass for developing CGI::Application
+CGI::Application::Server - A simple HTTP server for developing with CGI::Application
 
 =head1 SYNOPSIS
 
@@ -150,8 +150,12 @@ CGI::Application::Server - A HTTP::Server::Simple subclass for developing CGI::A
 
 =head1 DESCRIPTION
 
-This is a simple L<HTTP::Server::Simple> subclass for use during 
-development with L<CGI::Appliaction>. 
+This is a simple HTTP server for for use during development with 
+L<CGI::Appliaction>. At this moment, it serves our needs in a 
+very basic way. The plan is to release early and release often, 
+and add features when we need them. That said, we welcome any 
+and all patches, tests and feature requests (the ones with which 
+are accompanied by failing tests will get priority).
 
 =head1 METHODS
 
@@ -184,6 +188,11 @@ be served from.
 
 =back
 
+=head1 CAVEATS
+
+This is a subclass of L<HTTP::Server::Simple> and all of its caveats 
+apply here as well.
+
 =head1 BUGS
 
 All complex software has bugs lurking in it, and this module is no 
@@ -195,11 +204,27 @@ to cpan-RT.
 I use L<Devel::Cover> to test the code coverage of my tests, below 
 is the L<Devel::Cover> report on this module's test suite.
 
+ ---------------------------- ------ ------ ------ ------ ------ ------ ------
+ File                           stmt   bran   cond    sub    pod   time  total
+ ---------------------------- ------ ------ ------ ------ ------ ------ ------
+ CGI/Application/Server.pm      95.1   79.2   53.3  100.0  100.0  100.0   88.5
+ ---------------------------- ------ ------ ------ ------ ------ ------ ------
+ Total                          95.1   79.2   53.3  100.0  100.0  100.0   88.5
+ ---------------------------- ------ ------ ------ ------ ------ ------ ------
+
 =head1 ACKNOWLEDGEMENTS
+
+=over 4
+
+=item The HTTP response handling was shamelessly stolen from L<HTTP::Request::AsCGI> by chansen
+
+=back
 
 =head1 AUTHOR
 
 Stevan Little E<lt>stevan@iinteractive.comE<gt>
+
+Rob Kinyon E<lt>rob.kinyon@iinteractive.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

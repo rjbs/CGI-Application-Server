@@ -16,8 +16,20 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-	HTTP::Server::Simple
-	CGI::Application
+    HTTP::Request
+    HTTP::Status
+    IO::Capture::Stdout
+    CGI::Application
+    HTTP::Server::Simple
+    HTTP::Server::Simple::Static
+
+And requires these modules for testing:
+
+    Test::More
+    Test::Exception
+    Test::HTTP::Server::Simple
+    Test::WWW::Mechanize
+    CGI::Application::Plugin::Redirect
 
 COPYRIGHT AND LICENCE
 

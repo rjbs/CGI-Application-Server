@@ -12,3 +12,5 @@ t/htdocs/index.html
 t/htdocs/test.css
 t/htdocs/test.js
 t/lib/MyCGIApp.pm
+Makefile.PL
+META.yml

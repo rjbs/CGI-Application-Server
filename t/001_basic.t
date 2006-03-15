@@ -5,7 +5,7 @@ use warnings;
 
 use lib 't/lib/';
 
-use Test::More tests => 31;
+use Test::More tests => 34;
 
 use Test::Exception;
 use Test::HTTP::Server::Simple;
@@ -34,9 +34,21 @@ $server->entry_points({
 });
 is_deeply($server->entry_points, { '/index.cgi' => 'MyCGIApp' }, '... we have an entry point now');
 
+dies_ok {
+	$server->entry_points([]);	
+} '... entry points must be a HASH';
+
+dies_ok {
+	$server->entry_points('....');	
+} '... entry points must be a HASH';
+
 is($server->document_root, '.', '... got the default server root');
 $server->document_root('./t/htdocs');
 is($server->document_root, './t/htdocs', '... got the new server root');
+
+dies_ok {
+	$server->document_root('./t/nothing');	
+} '... cannot assign a doc root that does not exist';
 
 my $url_root = $server->started_ok("start up my web server");
 
