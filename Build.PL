@@ -22,6 +22,7 @@ my $build = Module::Build->new(
         'Test::Exception'            => '0.21',
         'Test::HTTP::Server::Simple' => '0.02',
         'Test::WWW::Mechanize'       => '1.08',
+        'CGI::Application::Plugin::Redirect' => '0',
     },
     create_makefile_pl => 'traditional',
     recursive_test_files => 1,
