@@ -18,20 +18,20 @@ sub new {
 	my $class = shift;
 	my $self  = $class->SUPER::new(@_); 
 	$self->{entry_points} = {};	
-	$self->{server_root}  = '.';
+	$self->{document_root}  = '.';
 	return $self;
 }
 
 # accessors
 
-sub server_root {
-	my ($self, $server_root) = @_;
-	if (defined $server_root) {
-		(-d $server_root)
-			|| confess "The server root ($server_root) is not found";
-		$self->{server_root} = $server_root;
+sub document_root {
+	my ($self, $document_root) = @_;
+	if (defined $document_root) {
+		(-d $document_root)
+			|| confess "The server root ($document_root) is not found";
+		$self->{document_root} = $document_root;
 	}
-	$self->{server_root};
+	$self->{document_root};
 }
 
 sub entry_points {
@@ -65,7 +65,7 @@ sub handle_request {
 		$entry_point->new->run;		
 	}
 	else {
-    	$self->serve_static($cgi, $self->server_root);
+    	$self->serve_static($cgi, $self->document_root);
 	} 
 }
 
@@ -84,7 +84,7 @@ CGI::Application::Server - A HTTP::Server::Simple subclass for developing CGI::A
   use CGI::Application::Server;
 
   my $server = CGI::Application::Server->new();
-  $server->server_root('./htdocs');
+  $server->document_root('./htdocs');
   $server->entry_points({
 	  '/index.cgi' => 'MyCGIApp',
 	  '/admin'     => 'MyCGIApp::Admin'
@@ -120,7 +120,7 @@ See the L<SYNOPSIS> above for an example.
 
 This attempts to match the C<$uri> to an entry point.
 
-=item B<server_root (?$server_root)>
+=item B<document_root (?$document_root)>
 
 This is the server's document root where all static files will 
 be served from.

@@ -34,9 +34,9 @@ $server->entry_points({
 });
 is_deeply($server->entry_points, { '/index.cgi' => 'MyCGIApp' }, '... we have an entry point now');
 
-is($server->server_root, '.', '... got the default server root');
-$server->server_root('./t/htdocs');
-is($server->server_root, './t/htdocs', '... got the new server root');
+is($server->document_root, '.', '... got the default server root');
+$server->document_root('./t/htdocs');
+is($server->document_root, './t/htdocs', '... got the new server root');
 
 my $url_root = $server->started_ok("start up my web server");
 
