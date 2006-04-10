@@ -1,4 +1,7 @@
 Changes for CGI::Application::Server
 
+0.02 Mon. April 10, 2006
+    - Added logging of every request (uri, entry-point, and params)
+
 0.01 Wed. March 15, 2006
     - initial release of module

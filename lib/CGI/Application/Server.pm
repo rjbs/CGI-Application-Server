@@ -4,16 +4,19 @@ package CGI::Application::Server;
 use strict;
 use warnings;
 
-use Carp         'confess';
+use Carp qw( confess );
 use CGI qw( param );
-use Scalar::Util 'blessed', 'reftype';
+use Scalar::Util qw( blessed reftype );
 use HTTP::Response;
 use HTTP::Status;
 use IO::Capture::Stdout;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
-use base qw(HTTP::Server::Simple::CGI HTTP::Server::Simple::Static);
+use base qw(
+    HTTP::Server::Simple::CGI
+    HTTP::Server::Simple::Static
+);
 
 # HTTP::Server::Simple methods
 
