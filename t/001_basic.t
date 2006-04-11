@@ -50,6 +50,10 @@ dies_ok {
 	$server->document_root('./t/nothing');	
 } '... cannot assign a doc root that does not exist';
 
+# ignore the warnings for now, 
+# they are too hard to test really
+local $SIG{__WARN__} = sub { 1 };
+
 my $url_root = $server->started_ok("start up my web server");
 
 my $mech = Test::WWW::Mechanize->new();
