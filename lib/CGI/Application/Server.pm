@@ -11,7 +11,7 @@ use HTTP::Response;
 use HTTP::Status;
 use IO::Capture::Stdout;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use base qw(
     HTTP::Server::Simple::CGI
@@ -21,62 +21,73 @@ use base qw(
 # HTTP::Server::Simple methods
 
 sub new {
-	my $class = shift;
-	my $self  = $class->SUPER::new(@_); 
-	$self->{entry_points} = {};	
-	$self->{document_root}  = '.';
-	return $self;
+    my $class = shift;
+    my $self  = $class->SUPER::new(@_); 
+    $self->{entry_points} = {};    
+    $self->{document_root}  = '.';
+    return $self;
 }
 
 # accessors
 
 sub document_root {
-	my ($self, $document_root) = @_;
-	if (defined $document_root) {
-		(-d $document_root)
-			|| confess "The server root ($document_root) is not found";
-		$self->{document_root} = $document_root;
-	}
-	$self->{document_root};
+    my ($self, $document_root) = @_;
+    if (defined $document_root) {
+        (-d $document_root)
+            || confess "The server root ($document_root) is not found";
+        $self->{document_root} = $document_root;
+    }
+    $self->{document_root};
 }
 
 sub entry_points {
-	my ($self, $entry_points) = @_;
-	if (defined $entry_points) {
-		(reftype($entry_points) && reftype($entry_points) eq 'HASH')
-			|| confess "The entry points map must be a HASH reference, not $entry_points";
-		$self->{entry_points} = $entry_points;
-	}
-	$self->{entry_points};	
+    my ($self, $entry_points) = @_;
+    if (defined $entry_points) {
+        (reftype($entry_points) && reftype($entry_points) eq 'HASH')
+            || confess "The entry points map must be a HASH reference, not $entry_points";
+        $self->{entry_points} = $entry_points;
+    }
+    $self->{entry_points};    
 }
 
 # check request
 
 sub is_valid_entry_point {
-	my ($self, $uri) = @_;
-	foreach my $entry_point (keys %{$self->{entry_points}}) {
-		return $self->{entry_points}->{$entry_point}
-			if index($uri, $entry_point) == 0;
-	}
-	return undef;
+    my ($self, $uri) = @_;
+
+    # Remove all parameters
+    $uri =~ s/\?.*//;
+
+    while ( $uri ) {
+        # Check to see if this is an exact match
+        if (exists $self->{entry_points}{$uri}) {
+            return $self->{entry_points}{$uri};
+        }
+
+        # Remove the rightmost path element
+        $uri =~ s/\/[^\/]*$//;
+    }
+
+    # Didn't find anything. Oh, well.
+    return;
 }
 
 sub handle_request {
-	my ($self, $cgi) = @_;
-	if (my $entry_point = $self->is_valid_entry_point($ENV{REQUEST_URI})) {
+    my ($self, $cgi) = @_;
+    if (my $entry_point = $self->is_valid_entry_point($ENV{REQUEST_URI})) {
         warn "$ENV{REQUEST_URI} ($entry_point)\n";
         warn "\t$_ => " . param( $_ ) . "\n" for param();
         my $capture = IO::Capture::Stdout->new;
         $capture->start;
-		$entry_point->new->run;		
+        $entry_point->new->run;        
         $capture->stop;
         my $stdout = join "\x0d\x0a", $capture->read;
         my $response = $self->_build_response( $stdout );
         print $response->as_string;
-	}
-	else {
-    	return $self->serve_static($cgi, $self->document_root);
-	} 
+    }
+    else {
+        return $self->serve_static($cgi, $self->document_root);
+    } 
 }
 
 # Shamelessly stolen from HTTP::Request::AsCGI by chansen
@@ -109,7 +120,7 @@ sub _build_response {
     if ( $status && $status =~ /^(\d\d\d)\s?(.+)?$/ ) {
 
         my $code    = $1;
-        my $message = $2 || HTTP::Status::status_message($code);
+        $message = $2 || HTTP::Status::status_message($code);
 
         $response->code($code);
         $response->message($message);
@@ -149,8 +160,8 @@ CGI::Application::Server - A simple HTTP server for developing with CGI::Applica
   my $server = CGI::Application::Server->new();
   $server->document_root('./htdocs');
   $server->entry_points({
-	  '/index.cgi' => 'MyCGIApp',
-	  '/admin'     => 'MyCGIApp::Admin'
+      '/index.cgi' => 'MyCGIApp',
+      '/admin'     => 'MyCGIApp::Admin'
   });
   $server->run();
 

@@ -17,11 +17,11 @@ BEGIN {
 }
 
 {
-	package TestServer;
-	use base qw/
-		Test::HTTP::Server::Simple
-		CGI::Application::Server
-	/;
+    package TestServer;
+    use base qw/
+        Test::HTTP::Server::Simple
+        CGI::Application::Server
+    /;
 }
 
 my $server = TestServer->new();
@@ -30,16 +30,16 @@ isa_ok($server, 'HTTP::Server::Simple');
 
 is_deeply($server->entry_points, {}, '... no entry-point yet');
 $server->entry_points({
-	'/index.cgi' => 'MyCGIApp'
+    '/index.cgi' => 'MyCGIApp'
 });
 is_deeply($server->entry_points, { '/index.cgi' => 'MyCGIApp' }, '... we have an entry point now');
 
 dies_ok {
-	$server->entry_points([]);	
+    $server->entry_points([]);    
 } '... entry points must be a HASH';
 
 dies_ok {
-	$server->entry_points('....');	
+    $server->entry_points('....');    
 } '... entry points must be a HASH';
 
 is($server->document_root, '.', '... got the default server root');
@@ -47,7 +47,7 @@ $server->document_root('./t/htdocs');
 is($server->document_root, './t/htdocs', '... got the new server root');
 
 dies_ok {
-	$server->document_root('./t/nothing');	
+    $server->document_root('./t/nothing');    
 } '... cannot assign a doc root that does not exist';
 
 # ignore the warnings for now, 
