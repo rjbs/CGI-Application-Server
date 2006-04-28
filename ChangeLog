@@ -1,5 +1,10 @@
 Changes for CGI::Application::Server
 
+0.03
+    - Fixed is_valid_entry_point to be more strict
+      in how it matched URIs
+      - added tests for this
+
 0.02 Mon. April 10, 2006
     - Added logging of every request (uri, entry-point, and params)
 
