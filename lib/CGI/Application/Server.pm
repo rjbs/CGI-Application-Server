@@ -81,7 +81,7 @@ sub handle_request {
         $capture->start;
         $entry_point->new->run;        
         $capture->stop;
-        my $stdout = join "\x0d\x0a", $capture->read;
+        my $stdout = join "", $capture->read;
         my $response = $self->_build_response( $stdout );
         print $response->as_string;
     }

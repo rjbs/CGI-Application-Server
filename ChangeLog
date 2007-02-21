@@ -1,9 +1,11 @@
 Changes for CGI::Application::Server
 
-0.03
+0.03 Tues. Feb 20, 2007
     - Fixed is_valid_entry_point to be more strict
       in how it matched URIs
       - added tests for this
+    - fixed the way the captured stdout is recombined
+      to make steaming non-HTML mime-types work      
 
 0.02 Mon. April 10, 2006
     - Added logging of every request (uri, entry-point, and params)
