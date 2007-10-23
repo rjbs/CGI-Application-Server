@@ -1,4 +1,4 @@
-CGI::Application::Server version 0.03
+CGI::Application::Server version 0.04
 =====================================
 
 See the individual module documentation for more information
@@ -18,7 +18,6 @@ This module requires these other modules and libraries:
 
     HTTP::Request
     HTTP::Status
-    IO::Capture::Stdout
     CGI::Application
     HTTP::Server::Simple
     HTTP::Server::Simple::Static

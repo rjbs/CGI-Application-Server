@@ -1,5 +1,8 @@
 Changes for CGI::Application::Server
 
+0.04 Sun. Oct 21, 2007
+    - add support for CGI::Application::Dispatch classes
+
 0.03 Tues. Feb 20, 2007
     - Fixed is_valid_entry_point to be more strict
       in how it matched URIs

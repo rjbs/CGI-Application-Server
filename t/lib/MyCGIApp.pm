@@ -10,9 +10,9 @@ sub setup {
 	$self->mode_param('rm');
 	$self->run_modes(
 	        'mode1' => 'hello_world',
-	        'mode2' => 'goodbye_world',		
-            'mode3' => 'redirected',
-            'mode4' => 'redirect_end',
+	        'mode2' => 'goodbye_world',
+	        'mode3' => 'redirected',
+	        'mode4' => 'redirect_end',
 	);
 }	
 
@@ -31,7 +31,7 @@ sub goodbye_world {
 
 sub redirected {
     my $self = shift;
-    return $self->redirect( "index.cgi?rm=mode4" );
+    return $self->redirect( "/index.cgi?rm=mode4" );
 }
 
 sub redirect_end {

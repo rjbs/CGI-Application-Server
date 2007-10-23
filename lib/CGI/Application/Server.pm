@@ -9,9 +9,8 @@ use CGI qw( param );
 use Scalar::Util qw( blessed reftype );
 use HTTP::Response;
 use HTTP::Status;
-use IO::Capture::Stdout;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use base qw(
     HTTP::Server::Simple::CGI
@@ -61,7 +60,7 @@ sub is_valid_entry_point {
     while ( $uri ) {
         # Check to see if this is an exact match
         if (exists $self->{entry_points}{$uri}) {
-            return $self->{entry_points}{$uri};
+            return ($uri, $self->{entry_points}{$uri});
         }
 
         # Remove the rightmost path element
@@ -74,14 +73,19 @@ sub is_valid_entry_point {
 
 sub handle_request {
     my ($self, $cgi) = @_;
-    if (my $entry_point = $self->is_valid_entry_point($ENV{REQUEST_URI})) {
-        warn "$ENV{REQUEST_URI} ($entry_point)\n";
+    if (my ($path, $target) = $self->is_valid_entry_point($ENV{REQUEST_URI})) {
+        warn "$ENV{REQUEST_URI} ($target)\n";
         warn "\t$_ => " . param( $_ ) . "\n" for param();
-        my $capture = IO::Capture::Stdout->new;
-        $capture->start;
-        $entry_point->new->run;        
-        $capture->stop;
-        my $stdout = join "", $capture->read;
+
+        my $stdout;
+        local $ENV{CGI_APP_RETURN_ONLY} = 1;
+        if ($target->isa('CGI::Application::Dispatch')) {
+          (local $ENV{PATH_INFO} = $ENV{PATH_INFO}) =~ s/\A\Q$path//;
+          $stdout = $target->dispatch;
+        } else {
+          $stdout = $target->new->run;        
+        }
+
         my $response = $self->_build_response( $stdout );
         print $response->as_string;
     }
@@ -161,7 +165,8 @@ CGI::Application::Server - A simple HTTP server for developing with CGI::Applica
   $server->document_root('./htdocs');
   $server->entry_points({
       '/index.cgi' => 'MyCGIApp',
-      '/admin'     => 'MyCGIApp::Admin'
+      '/admin'     => 'MyCGIApp::Admin',
+      '/account'   => 'MyCGIApp::Account::Dispatch',
   });
   $server->run();
 
@@ -190,9 +195,9 @@ to an entry point, or serve a static file (html, jpeg, gif, etc).
 
 =item B<entry_points (?$entry_points)>
 
-This accepts a HASH reference in C<$entry_points>, which maps 
-server entry points (uri) to L<CGI::Application> class names. 
-See the L<SYNOPSIS> above for an example.
+This accepts a HASH reference in C<$entry_points>, which maps server entry
+points (uri) to L<CGI::Application> or L<CGI::Application::Dispatch> class
+names.  See the L<SYNOPSIS> above for an example.
 
 =item B<is_valid_entry_point ($uri)>
 
@@ -224,9 +229,8 @@ is the L<Devel::Cover> report on this module's test suite.
  ---------------------------- ------ ------ ------ ------ ------ ------ ------
  File                           stmt   bran   cond    sub    pod   time  total
  ---------------------------- ------ ------ ------ ------ ------ ------ ------
- CGI/Application/Server.pm      95.1   79.2   53.3  100.0  100.0  100.0   88.5
- ---------------------------- ------ ------ ------ ------ ------ ------ ------
- Total                          95.1   79.2   53.3  100.0  100.0  100.0   88.5
+ ...CGI/Application/Server.pm   95.6   80.8   53.3  100.0  100.0  100.0   89.4
+ Total                          95.6   80.8   53.3  100.0  100.0  100.0   89.4
  ---------------------------- ------ ------ ------ ------ ------ ------ ------
 
 =head1 ACKNOWLEDGEMENTS
