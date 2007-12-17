@@ -79,8 +79,8 @@ sub handle_request {
 
         my $stdout;
         local $ENV{CGI_APP_RETURN_ONLY} = 1;
+        (local $ENV{PATH_INFO} = $ENV{PATH_INFO}) =~ s/\A\Q$path//;
         if ($target->isa('CGI::Application::Dispatch')) {
-          (local $ENV{PATH_INFO} = $ENV{PATH_INFO}) =~ s/\A\Q$path//;
           $stdout = $target->dispatch;
         } else {
           $stdout = $target->new->run;        
