@@ -10,7 +10,7 @@ use Scalar::Util qw( blessed reftype );
 use HTTP::Response;
 use HTTP::Status;
 
-our $VERSION = '0.04';
+our $VERSION = '0.050';
 
 use base qw(
     HTTP::Server::Simple::CGI
@@ -79,17 +79,23 @@ sub handle_request {
 
         my $stdout;
         local $ENV{CGI_APP_RETURN_ONLY} = 1;
+        (local $ENV{PATH_INFO} = $ENV{PATH_INFO}) =~ s/\A\Q$path//;
+
         if ($target->isa('CGI::Application::Dispatch')) {
-          (local $ENV{PATH_INFO} = $ENV{PATH_INFO}) =~ s/\A\Q$path//;
           $stdout = $target->dispatch;
+        } elsif ($target->isa('CGI::Application')) {
+          if (!defined blessed $target) {
+            $stdout = $target->new->run;
+          } else {
+            $stdout = $target->run;
+          }
         } else {
-          $stdout = $target->new->run;        
+          confess "Target must be a CGI::Application or CGI::Application::Dispatch subclass\n";
         }
 
         my $response = $self->_build_response( $stdout );
         print $response->as_string;
-    }
-    else {
+    } else {
         return $self->serve_static($cgi, $self->document_root);
     } 
 }
@@ -162,11 +168,15 @@ CGI::Application::Server - A simple HTTP server for developing with CGI::Applica
   use CGI::Application::Server;
 
   my $server = CGI::Application::Server->new();
+ 
+  my $object = MyOtherCGIApp->new(PARAMS => { foo => 1, bar => 2 });
+  
   $server->document_root('./htdocs');
   $server->entry_points({
       '/index.cgi' => 'MyCGIApp',
       '/admin'     => 'MyCGIApp::Admin',
       '/account'   => 'MyCGIApp::Account::Dispatch',
+      '/users'     => $object,
   });
   $server->run();
 
@@ -197,7 +207,7 @@ to an entry point, or serve a static file (html, jpeg, gif, etc).
 
 This accepts a HASH reference in C<$entry_points>, which maps server entry
 points (uri) to L<CGI::Application> or L<CGI::Application::Dispatch> class
-names.  See the L<SYNOPSIS> above for an example.
+names or objects. See the L<SYNOPSIS> above for examples.
 
 =item B<is_valid_entry_point ($uri)>
 
@@ -229,8 +239,8 @@ is the L<Devel::Cover> report on this module's test suite.
  ---------------------------- ------ ------ ------ ------ ------ ------ ------
  File                           stmt   bran   cond    sub    pod   time  total
  ---------------------------- ------ ------ ------ ------ ------ ------ ------
- ...CGI/Application/Server.pm   95.6   80.8   53.3  100.0  100.0  100.0   89.4
- Total                          95.6   80.8   53.3  100.0  100.0  100.0   89.4
+ ...CGI/Application/Server.pm   94.4   80.0   53.3  100.0  100.0  100.0   88.3
+ Total                          94.4   80.0   53.3  100.0  100.0  100.0   88.3
  ---------------------------- ------ ------ ------ ------ ------ ------ ------
 
 =head1 ACKNOWLEDGEMENTS
@@ -246,6 +256,8 @@ is the L<Devel::Cover> report on this module's test suite.
 Stevan Little E<lt>stevan@iinteractive.comE<gt>
 
 Rob Kinyon E<lt>rob.kinyon@iinteractive.comE<gt>
+
+Ricardo SIGNES E<lt>rjbs@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

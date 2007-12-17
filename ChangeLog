@@ -1,5 +1,10 @@
 Changes for CGI::Application::Server
 
+0.050 Sun. Oct 21, 2007
+    - add support for CGI::Application objects as entry points
+		- handle PATH_INFO munging for CGI::App, not just ::Dispatch
+		- both these changes thanks to JALDHAR
+
 0.04 Sun. Oct 21, 2007
     - add support for CGI::Application::Dispatch classes
 
