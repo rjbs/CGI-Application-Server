@@ -239,8 +239,8 @@ is the L<Devel::Cover> report on this module's test suite.
  ---------------------------- ------ ------ ------ ------ ------ ------ ------
  File                           stmt   bran   cond    sub    pod   time  total
  ---------------------------- ------ ------ ------ ------ ------ ------ ------
- ...CGI/Application/Server.pm   95.6   80.8   53.3  100.0  100.0  100.0   89.4
- Total                          95.6   80.8   53.3  100.0  100.0  100.0   89.4
+ ...CGI/Application/Server.pm   94.4   80.0   53.3  100.0  100.0  100.0   88.3
+ Total                          94.4   80.0   53.3  100.0  100.0  100.0   88.3
  ---------------------------- ------ ------ ------ ------ ------ ------ ------
 
 =head1 ACKNOWLEDGEMENTS
@@ -256,6 +256,8 @@ is the L<Devel::Cover> report on this module's test suite.
 Stevan Little E<lt>stevan@iinteractive.comE<gt>
 
 Rob Kinyon E<lt>rob.kinyon@iinteractive.comE<gt>
+
+Ricardo SIGNES E<lt>rjbs@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
