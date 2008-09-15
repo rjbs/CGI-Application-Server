@@ -183,7 +183,7 @@ CGI::Application::Server - A simple HTTP server for developing with CGI::Applica
 =head1 DESCRIPTION
 
 This is a simple HTTP server for for use during development with 
-L<CGI::Appliaction>. At this moment, it serves our needs in a 
+L<CGI::Application>. At this moment, it serves our needs in a 
 very basic way. The plan is to release early and release often, 
 and add features when we need them. That said, we welcome any 
 and all patches, tests and feature requests (the ones with which 
