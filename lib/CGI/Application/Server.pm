@@ -67,6 +67,11 @@ sub is_valid_entry_point {
         $uri =~ s/\/[^\/]*$//;
     }
 
+    # Check to see if there's an entry for '/'
+    if (exists $self->{entry_points}{'/'}) {
+	return ($uri, $self->{entry_points}{'/'});
+    }
+
     # Didn't find anything. Oh, well.
     return;
 }
@@ -166,6 +171,7 @@ CGI::Application::Server - A simple HTTP server for developing with CGI::Applica
 =head1 SYNOPSIS
 
   use CGI::Application::Server;
+  use MyCGIApp::DefaultApp;
 
   my $server = CGI::Application::Server->new();
  
@@ -173,6 +179,7 @@ CGI::Application::Server - A simple HTTP server for developing with CGI::Applica
   
   $server->document_root('./htdocs');
   $server->entry_points({
+      '/'          => 'MyCGIApp::DefaultApp',
       '/index.cgi' => 'MyCGIApp',
       '/admin'     => 'MyCGIApp::Admin',
       '/account'   => 'MyCGIApp::Account::Dispatch',
