@@ -12,10 +12,8 @@ use HTTP::Status;
 
 our $VERSION = '0.050';
 
-use base qw(
-    HTTP::Server::Simple::CGI
-    HTTP::Server::Simple::Static
-);
+use base qw( HTTP::Server::Simple::CGI );
+use HTTP::Server::Simple::Static;
 
 # HTTP::Server::Simple methods
 
