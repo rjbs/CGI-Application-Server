@@ -1,5 +1,11 @@
 Changes for CGI::Application::Server
 
+0.060 Sun. Nov  2, 2008
+		- a number of patches from George Hartzell; thanks!
+		- documenation improvements
+		- use HTTP::Server::Simple::Static as its documentation suggests
+		- add handling for a "/" entry point
+
 0.050 Sun. Oct 21, 2007
     - add support for CGI::Application objects as entry points
 		- handle PATH_INFO munging for CGI::App, not just ::Dispatch
