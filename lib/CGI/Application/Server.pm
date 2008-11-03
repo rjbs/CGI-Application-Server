@@ -87,12 +87,12 @@ sub handle_request {
 	  return $self->serve_static($cgi, $target);
 	}
 	elsif ($target->isa('CGI::Application::Dispatch')) {
-	  return $self->serve_response($target->dispatch);
+	  return $self->_serve_response($target->dispatch);
         } elsif ($target->isa('CGI::Application')) {
           if (!defined blessed $target) {
-	    return $self->serve_response($target->new->run);
+	    return $self->_serve_response($target->new->run);
           } else {
-	    return $self->serve_response($target->run);
+	    return $self->_serve_response($target->run);
           }
 	}
 	else {
@@ -103,7 +103,7 @@ sub handle_request {
     } 
 }
 
-sub serve_response {
+sub _serve_response {
   my ( $self, $stdout ) = @_;
 
   my $response = $self->_build_response( $stdout );
