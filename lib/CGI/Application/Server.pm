@@ -80,27 +80,36 @@ sub handle_request {
         warn "$ENV{REQUEST_URI} ($target)\n";
         warn "\t$_ => " . param( $_ ) . "\n" for param();
 
-        my $stdout;
         local $ENV{CGI_APP_RETURN_ONLY} = 1;
         (local $ENV{PATH_INFO} = $ENV{PATH_INFO}) =~ s/\A\Q$path//;
 
-        if ($target->isa('CGI::Application::Dispatch')) {
-          $stdout = $target->dispatch;
+        if (-d $target && -x $target) {
+	  return $self->serve_static($cgi, $target);
+	}
+	elsif ($target->isa('CGI::Application::Dispatch')) {
+	  return $self->serve_response($target->dispatch);
         } elsif ($target->isa('CGI::Application')) {
           if (!defined blessed $target) {
-            $stdout = $target->new->run;
+	    return $self->serve_response($target->new->run);
           } else {
-            $stdout = $target->run;
+	    return $self->serve_response($target->run);
           }
-        } else {
-          confess "Target must be a CGI::Application or CGI::Application::Dispatch subclass\n";
+	}
+	else {
+          confess "Target must be a CGI::Application or CGI::Application::Dispatch subclass or the name of a directory that exists and is readable.\n";
         }
-
-        my $response = $self->_build_response( $stdout );
-        print $response->as_string;
     } else {
         return $self->serve_static($cgi, $self->document_root);
     } 
+}
+
+sub serve_response {
+  my ( $self, $stdout ) = @_;
+
+  my $response = $self->_build_response( $stdout );
+  print $response->as_string();
+
+  return 1;			# Like ...Simple::Static::serve_static does
 }
 
 # Shamelessly stolen from HTTP::Request::AsCGI by chansen
@@ -185,6 +194,7 @@ CGI::Application::Server - A simple HTTP server for developing with CGI::Applica
       '/admin'     => 'MyCGIApp::Admin',
       '/account'   => 'MyCGIApp::Account::Dispatch',
       '/users'     => $object,
+      '/static'    => '/usr/local/htdocs',
   });
   $server->run();
 
@@ -215,7 +225,8 @@ to an entry point, or serve a static file (html, jpeg, gif, etc).
 
 This accepts a HASH reference in C<$entry_points>, which maps server entry
 points (uri) to L<CGI::Application> or L<CGI::Application::Dispatch> class
-names or objects. See the L<SYNOPSIS> above for examples.
+names or objects or to directories from which static content will be served
+by HTTP::Server::Simple::Static.  See the L<SYNOPSIS> above for examples.
 
 =item B<is_valid_entry_point ($uri)>
 
