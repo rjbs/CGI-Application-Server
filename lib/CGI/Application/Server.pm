@@ -171,6 +171,9 @@ CGI::Application::Server - A simple HTTP server for developing with CGI::Applica
 =head1 SYNOPSIS
 
   use CGI::Application::Server;
+  use MyCGIApp;
+  use MyCGIApp::Admin;
+  use MyCGI::App::Account::Dispatch;
   use MyCGIApp::DefaultApp;
 
   my $server = CGI::Application::Server->new();
