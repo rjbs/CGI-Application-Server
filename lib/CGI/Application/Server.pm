@@ -92,6 +92,7 @@ sub handle_request {
           if (!defined blessed $target) {
 	    return $self->_serve_response($target->new->run);
           } else {
+        $target->query($cgi);
 	    return $self->_serve_response($target->run);
           }
 	}

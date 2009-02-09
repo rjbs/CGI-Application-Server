@@ -11,11 +11,13 @@ t/002_valid_entry_points.t
 t/003_dispatch.t
 t/004_object_as_entry_point.t
 t/005_mode_param_from_path_info.t
+t/006_replacequeryobject.t
 t/htdocs/index.html
 t/htdocs/test.css
 t/htdocs/test.js
 t/lib/AppWithParams.pm
 t/lib/MyCGIApp.pm
 t/lib/MyCGIApp/Dispatch.pm
+t/lib/ReplaceQueryObject.pm
 t/pod.t
 t/pod_coverage.t
