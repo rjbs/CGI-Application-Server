@@ -1,5 +1,9 @@
 Changes for CGI::Application::Server
 
+0.061			2009-02-08
+					reinitialize $query between runs when entry point is an object
+					(patch from JALDHAR, rt #42199)
+
 0.060 Sun. Nov  2, 2008
 		- a number of patches from George Hartzell; thanks!
 		- documenation improvements

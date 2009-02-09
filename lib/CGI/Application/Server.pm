@@ -10,7 +10,7 @@ use Scalar::Util qw( blessed reftype );
 use HTTP::Response;
 use HTTP::Status;
 
-our $VERSION = '0.060';
+our $VERSION = '0.061';
 
 use base qw( HTTP::Server::Simple::CGI );
 use HTTP::Server::Simple::Static;
