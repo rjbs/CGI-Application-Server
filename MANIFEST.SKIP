@@ -15,4 +15,5 @@ cover_db
 ^blibdirs$
 \.old$
 ^#.*#$
-^\.#
+^\.#^MYMETA.yml$
+\.git

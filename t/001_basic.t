@@ -24,7 +24,9 @@ BEGIN {
     /;
 }
 
-my $server = TestServer->new();
+my $port = $ENV{CGI_APP_SERVER_TEST_PORT} || 40000 + int(rand(10000));
+
+my $server = TestServer->new($port);
 isa_ok($server, 'CGI::Application::Server');
 isa_ok($server, 'HTTP::Server::Simple');
 

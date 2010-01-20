@@ -23,8 +23,10 @@ my $app2 = AppWithParams->new(PARAMS => {
         CGI::Application::Server
     /;
 }
-                            
-my $server = TestServer->new();
+
+my $port = $ENV{CGI_APP_SERVER_TEST_PORT} || 40000 + int(rand(10000));
+
+my $server = TestServer->new($port);
 $server->entry_points({
     '/foo/index.cgi'         => $app1,
     '/bar/index.cgi'         => $app2,
