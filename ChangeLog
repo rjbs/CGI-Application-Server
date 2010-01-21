@@ -1,5 +1,9 @@
 Changes for CGI::Application::Server
 
+0.062			2010-01-20
+					work on alternate ports (thanks, Potatohead @ github)
+					misc. cleanup (Potatohead, rjbs)
+
 0.061			2009-02-08
 					reinitialize $query between runs when entry point is an object
 					(patch from JALDHAR, rt #42199)
