@@ -23,10 +23,9 @@ my $build = Module::Build->new(
         'Test::WWW::Mechanize'       => '1.08',
         'CGI::Application::Plugin::Redirect' => '0',
     },
-    create_makefile_pl => 'traditional',
     recursive_test_files => 1,
     add_to_cleanup => [
-        'META.yml', '*.bak', '*.gz', 'Makefile.PL',
+        'META.yml', '*.bak', '*.gz',
     ],
 );
 
