@@ -1,4 +1,3 @@
-
 package CGI::Application::Server;
 
 use strict;
@@ -10,7 +9,7 @@ use Scalar::Util qw( blessed reftype );
 use HTTP::Response;
 use HTTP::Status;
 
-our $VERSION = '0.062';
+our $VERSION = '0.062n';
 
 use base qw( HTTP::Server::Simple::CGI );
 use HTTP::Server::Simple::Static;
@@ -22,6 +21,7 @@ sub new {
     my $self  = $class->SUPER::new(@_); 
     $self->{entry_points} = {};    
     $self->{document_root}  = '.';
+    $self->{default_index}  = '/index.html';
     return $self;
 }
 
@@ -35,6 +35,18 @@ sub document_root {
         $self->{document_root} = $document_root;
     }
     $self->{document_root};
+}
+
+sub default_index {
+    my ($self, $default_index) = @_;
+    if (defined $default_index) {
+        my $default_url = $self->{document_root};
+        $default_url .= $default_index;
+        (-f $default_url)
+            || confess "The server default_index ($default_url) [$default_index] is not found";
+        $self->{default_index} = $default_index;
+    }
+    $self->{default_index};
 }
 
 sub entry_points {
@@ -100,6 +112,20 @@ sub handle_request {
           confess "Target must be a CGI::Application or CGI::Application::Dispatch subclass or the name of a directory that exists and is readable.\n";
         }
     } else {
+    	my $path = $cgi->path_info();
+        if($path=~m/^\/?$/){
+           my $file = shift || './t/www/index.html';
+                # We want to pull the fiel from $self->{document_root} .'/'. ($self->{default_index}=~s/^\//g)
+                # but you get the idea for now. LxR
+           if (-f "$file" && $file!~m/\.\./){
+                open (FILE, "<$file");
+                while(<FILE>){ print $_; } #
+                close(FILE);
+           }else{
+                print qq |<a href="/cgi-bin/index.cgi">Welcome - We will be with you shortly.</a>|;
+           }
+           return 1;
+        }
         return $self->serve_static($cgi, $self->document_root);
     } 
 }
