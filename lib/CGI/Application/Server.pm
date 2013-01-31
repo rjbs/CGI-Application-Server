@@ -186,6 +186,9 @@ CGI::Application::Server - A simple HTTP server for developing with CGI::Applica
 
   my $server = CGI::Application::Server->new();
  
+  # this CGI::Application object will stay persistent, might not be safe to use
+  # in this way - your mileage may vary
+  # http://www.mail-archive.com/cgiapp@lists.erlbaum.net/msg08997.html
   my $object = MyOtherCGIApp->new(PARAMS => { foo => 1, bar => 2 });
   
   $server->document_root('./htdocs');
