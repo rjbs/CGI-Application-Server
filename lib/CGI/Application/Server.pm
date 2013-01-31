@@ -1,4 +1,3 @@
-
 package CGI::Application::Server;
 
 use strict;
@@ -10,7 +9,7 @@ use Scalar::Util qw( blessed reftype );
 use HTTP::Response;
 use HTTP::Status;
 
-our $VERSION = '0.062';
+our $VERSION = '0.062n1';
 
 use base qw( HTTP::Server::Simple::CGI );
 use HTTP::Server::Simple::Static;
@@ -19,9 +18,10 @@ use HTTP::Server::Simple::Static;
 
 sub new {
     my $class = shift;
-    my $self  = $class->SUPER::new(@_); 
-    $self->{entry_points} = {};    
+    my $self  = $class->SUPER::new(@_);
+    $self->{entry_points} = {};
     $self->{document_root}  = '.';
+    $self->{default_index}  = '/index.html';
     return $self;
 }
 
@@ -37,6 +37,18 @@ sub document_root {
     $self->{document_root};
 }
 
+sub default_index {
+    my ($self, $default_index) = @_;
+    if (defined $default_index) {
+        my $default_url = $self->{document_root};
+    $default_url .= $default_index;
+        (-f $default_url)
+            || confess "The server default_index ($default_url) [$default_index] is not found";
+        $self->{default_index} = $default_index;
+    }
+    $self->{default_index};
+}
+
 sub entry_points {
     my ($self, $entry_points) = @_;
     if (defined $entry_points) {
@@ -44,7 +56,7 @@ sub entry_points {
             || confess "The entry points map must be a HASH reference, not $entry_points";
         $self->{entry_points} = $entry_points;
     }
-    $self->{entry_points};    
+    $self->{entry_points};
 }
 
 # check request
@@ -67,7 +79,7 @@ sub is_valid_entry_point {
 
     # Check to see if there's an entry for '/'
     if (exists $self->{entry_points}{'/'}) {
-	return ($uri, $self->{entry_points}{'/'});
+    return ($uri, $self->{entry_points}{'/'});
     }
 
     # Didn't find anything. Oh, well.
@@ -84,24 +96,40 @@ sub handle_request {
         (local $ENV{PATH_INFO} = $ENV{PATH_INFO}) =~ s/\A\Q$path//;
 
         if (-d $target && -x $target) {
-	  return $self->serve_static($cgi, $target);
-	}
-	elsif ($target->isa('CGI::Application::Dispatch')) {
-	  return $self->_serve_response($target->dispatch);
-        } elsif ($target->isa('CGI::Application')) {
-          if (!defined blessed $target) {
-	    return $self->_serve_response($target->new->run);
-          } else {
-        $target->query($cgi);
-	    return $self->_serve_response($target->run);
-          }
-	}
-	else {
+            return $self->serve_static($cgi, $target);
+        }
+        elsif ($target->isa('CGI::Application::Dispatch')) {
+          return $self->_serve_response($target->dispatch);
+            } elsif ($target->isa('CGI::Application')) {
+              if (!defined blessed $target) {
+            return $self->_serve_response($target->new->run);
+              } else {
+            $target->query($cgi);
+            return $self->_serve_response($target->run);
+              }
+        }
+        else {
           confess "Target must be a CGI::Application or CGI::Application::Dispatch subclass or the name of a directory that exists and is readable.\n";
         }
     } else {
+        my $path = $cgi->path_info();
+        if($path=~m/^\/?$/){
+           my $file = shift || './t/www/index.html';
+           my $index_file = $self->{document_root} . '/'. $self->{default_index};
+           if(-f $index_file){ $file = $index_file; }
+           if (-f "$file"){
+             open (FILE, "<$file");
+             while(<FILE>){ print $_; }
+             close(FILE);
+           }else{
+             print "HTTP/1.1 200 OK\n";
+             print "Content-type: text/html; charset=iso-8859-1\n\n";
+             print qq |<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN"><href><body><a href="/cgi-bin/index.cgi">Welcome</a></body></html>|;
+           }
+           return 1;
+        }
         return $self->serve_static($cgi, $self->document_root);
-    } 
+    }
 }
 
 sub _serve_response {
@@ -110,7 +138,7 @@ sub _serve_response {
   my $response = $self->_build_response( $stdout );
   print $response->as_string();
 
-  return 1;			# Like ...Simple::Static::serve_static does
+  return 1;         # Like ...Simple::Static::serve_static does
 }
 
 # Shamelessly stolen from HTTP::Request::AsCGI by chansen
@@ -148,7 +176,6 @@ sub _build_response {
         $response->code($code);
         $response->message($message);
     }
-    
     my $length = length $stdout;
 
     if ( $response->code == 500 && !$length ) {
@@ -192,6 +219,7 @@ CGI::Application::Server - A simple HTTP server for developing with CGI::Applica
   my $object = MyOtherCGIApp->new(PARAMS => { foo => 1, bar => 2 });
   
   $server->document_root('./htdocs');
+  $server->default_index('/index.html');
   $server->entry_points({
       '/'          => 'MyCGIApp::DefaultApp',
       '/index.cgi' => 'MyCGIApp',
@@ -240,6 +268,7 @@ This attempts to match the C<$uri> to an entry point.
 
 This is the server's document root where all static files will 
 be served from.
+
 
 =back
 
