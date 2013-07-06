@@ -1,26 +1,24 @@
-
-package CGI::Application::Server;
-
 use strict;
 use warnings;
+package CGI::Application::Server;
+# ABSTRACT: a simple HTTP server for developing with CGI::Application
 
-use Carp qw( confess );
+use Carp 0.01 qw( confess );
 use CGI qw( param );
-use Scalar::Util qw( blessed reftype );
+use Scalar::Util 1.18 qw( blessed reftype );
 use HTTP::Response;
 use HTTP::Status;
 
-our $VERSION = '0.062';
-
 use base qw( HTTP::Server::Simple::CGI );
-use HTTP::Server::Simple::Static;
+use HTTP::Server::Simple 0.18;
+use HTTP::Server::Simple::Static 0.02;
 
 # HTTP::Server::Simple methods
 
 sub new {
     my $class = shift;
-    my $self  = $class->SUPER::new(@_); 
-    $self->{entry_points} = {};    
+    my $self  = $class->SUPER::new(@_);
+    $self->{entry_points} = {};
     $self->{document_root}  = '.';
     return $self;
 }
@@ -44,7 +42,7 @@ sub entry_points {
             || confess "The entry points map must be a HASH reference, not $entry_points";
         $self->{entry_points} = $entry_points;
     }
-    $self->{entry_points};    
+    $self->{entry_points};
 }
 
 # check request
@@ -101,7 +99,7 @@ sub handle_request {
         }
     } else {
         return $self->serve_static($cgi, $self->document_root);
-    } 
+    }
 }
 
 sub _serve_response {
@@ -148,7 +146,7 @@ sub _build_response {
         $response->code($code);
         $response->message($message);
     }
-    
+
     my $length = length $stdout;
 
     if ( $response->code == 500 && !$length ) {
@@ -170,12 +168,6 @@ sub _build_response {
 
 __END__
 
-=pod
-
-=head1 NAME
-
-CGI::Application::Server - A simple HTTP server for developing with CGI::Application
-
 =head1 SYNOPSIS
 
   use CGI::Application::Server;
@@ -185,12 +177,12 @@ CGI::Application::Server - A simple HTTP server for developing with CGI::Applica
   use MyCGIApp::DefaultApp;
 
   my $server = CGI::Application::Server->new();
- 
+
   # this CGI::Application object will stay persistent, might not be safe to use
   # in this way - your mileage may vary
   # http://www.mail-archive.com/cgiapp@lists.erlbaum.net/msg08997.html
   my $object = MyOtherCGIApp->new(PARAMS => { foo => 1, bar => 2 });
-  
+
   $server->document_root('./htdocs');
   $server->entry_points({
       '/'          => 'MyCGIApp::DefaultApp',
@@ -204,91 +196,47 @@ CGI::Application::Server - A simple HTTP server for developing with CGI::Applica
 
 =head1 DESCRIPTION
 
-This is a simple HTTP server for for use during development with 
-L<CGI::Application>. At this moment, it serves our needs in a 
-very basic way. The plan is to release early and release often, 
-and add features when we need them. That said, we welcome any 
-and all patches, tests and feature requests (the ones with which 
+This is a simple HTTP server for for use during development with
+L<CGI::Application>. At this moment, it serves our needs in a
+very basic way. The plan is to release early and release often,
+and add features when we need them. That said, we welcome any
+and all patches, tests and feature requests (the ones with which
 are accompanied by failing tests will get priority).
 
-=head1 METHODS
+=method B<new ($port)>
 
-=over 4
-
-=item B<new ($port)>
-
-This acts just like C<new> for L<HTTP::Server::Simple>, except it 
+This acts just like C<new> for L<HTTP::Server::Simple>, except it
 will initialize instance slots that we use.
 
-=item B<handle_request>
+=method B<handle_request>
 
-This will check the request uri and dispatch appropriately, either 
+This will check the request uri and dispatch appropriately, either
 to an entry point, or serve a static file (html, jpeg, gif, etc).
 
-=item B<entry_points (?$entry_points)>
+=method B<entry_points (?$entry_points)>
 
 This accepts a HASH reference in C<$entry_points>, which maps server entry
 points (uri) to L<CGI::Application> or L<CGI::Application::Dispatch> class
 names or objects or to directories from which static content will be served
 by HTTP::Server::Simple::Static.  See the L<SYNOPSIS> above for examples.
 
-=item B<is_valid_entry_point ($uri)>
+=method B<is_valid_entry_point ($uri)>
 
 This attempts to match the C<$uri> to an entry point.
 
-=item B<document_root (?$document_root)>
+=method B<document_root (?$document_root)>
 
-This is the server's document root where all static files will 
+This is the server's document root where all static files will
 be served from.
-
-=back
 
 =head1 CAVEATS
 
-This is a subclass of L<HTTP::Server::Simple> and all of its caveats 
+This is a subclass of L<HTTP::Server::Simple> and all of its caveats
 apply here as well.
-
-=head1 BUGS
-
-All complex software has bugs lurking in it, and this module is no 
-exception. If you find a bug please either email me, or add the bug
-to cpan-RT.
-
-=head1 CODE COVERAGE
-
-I use L<Devel::Cover> to test the code coverage of my tests, below 
-is the L<Devel::Cover> report on this module's test suite.
-
- ---------------------------- ------ ------ ------ ------ ------ ------ ------
- File                           stmt   bran   cond    sub    pod   time  total
- ---------------------------- ------ ------ ------ ------ ------ ------ ------
- ...CGI/Application/Server.pm   94.4   80.0   53.3  100.0  100.0  100.0   88.3
- Total                          94.4   80.0   53.3  100.0  100.0  100.0   88.3
- ---------------------------- ------ ------ ------ ------ ------ ------ ------
 
 =head1 ACKNOWLEDGEMENTS
 
-=over 4
-
-=item The HTTP response handling was shamelessly stolen from L<HTTP::Request::AsCGI> by chansen
-
-=back
-
-=head1 AUTHOR
-
-Stevan Little E<lt>stevan@iinteractive.comE<gt>
-
-Rob Kinyon E<lt>rob.kinyon@iinteractive.comE<gt>
-
-Ricardo SIGNES E<lt>rjbs@cpan.orgE<gt>
-
-=head1 COPYRIGHT AND LICENSE
-
-Copyright 2006 by Infinity Interactive, Inc.
-
-L<http://www.iinteractive.com>
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. 
+The HTTP response handling was shamelessly stolen from L<HTTP::Request::AsCGI>
+by chansen
 
 =cut
