@@ -1,6 +1,7 @@
 Changes for CGI::Application::Server
 
 {{$NEXT}}
+          point bugtracker back at RT; rjbs is abandoning this library
 
 0.063     2013-07-05 21:08:53 America/New_York
           repackage, update bugtracker
